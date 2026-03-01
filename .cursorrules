@@ -1,0 +1,373 @@
+You are working in a strict, scalable Vue 3 application.
+
+TECH STACK
+
+- Vue 3 (latest stable)
+- Vite
+- TypeScript (strict mode, noImplicitAny true)
+- Pinia
+- Vue Router
+- Tailwind CSS (latest stable)
+
+────────────────────────
+CORE PRINCIPLES
+────────────────────────
+
+- Use Composition API only.
+- <script setup lang="ts" name="ComponentName"> is mandatory.
+- No Options API.
+- No default exports.
+- One component per file.
+- Strong separation of concerns.
+- Components must remain presentational whenever possible.
+- Business logic must never live inside components.
+- Architecture must support scalability and modularity.
+- No circular dependencies between layers.
+
+────────────────────────
+NAMING CONVENTIONS
+────────────────────────
+
+- Components → kebab-case folder, index.vue component name.
+- Composables → useSomething.ts in domain folder.
+- Stores → <domain>.store.ts
+- Services → <entity>.service.ts
+- Types → index.ts inside domain folder.
+- Utils → camelCase function names.
+- No abbreviations in naming.
+
+────────────────────────
+TYPES SYSTEM
+────────────────────────
+
+- Strict typing only. Never use:
+    any
+    unknown (unless truly unavoidable)
+    implicit returns
+- Prefer interfaces for objects.
+- Types must contain zero logic.
+
+Folder structure:
+
+/types
+    /api
+    /app
+    /ui
+    /utils
+
+Structure:
+
+types/<domain>/<entity>/index.ts
+
+Rules:
+
+- Separate API request and response types.
+- Never mix API and domain/app types.
+- Create mapping functions if transformation is required.
+- All service responses must return typed data.
+- No type duplication across domains.
+
+────────────────────────
+COMPONENT RULES
+────────────────────────
+
+Location:
+components/<domain>/<component-name>/index.vue
+
+Example:
+components/ui/button/index.vue
+components/app/challenge/index.vue
+
+Inside component order:
+
+1. Imports
+2. Dont use Props interface
+3. defineProps
+4. defineEmits
+5. Store usage
+6. Composables usage
+7. Local state
+8. Computed
+9. Methods
+10. Lifecycle hooks
+11. Use lazy loading for imports.
+12. Always use the comments for sections to keep the code clean and maintainable. Use it when needed. Example:
+    <script setup lang="ts" name="ComponentName">
+    // Imports
+    // Types
+    // Props
+    // Emits
+    // Store
+    // Composables
+    // State
+    // Computed
+    // Methods
+    // Lifecycle hooks
+    </script>
+
+Rules:
+
+- No inline functions in template.
+- No async logic in template.
+- No direct API calls.
+- No business logic.
+- No data transformation logic.
+- Do not directly mutate store state in template.
+- Use Tailwind utilities only.
+- Always use scoped CSS.
+- No deep selectors.
+- Do not use !important.
+- If using v-if for example <p v-if="codition"> please use <template v-if="codition"> <p> </p> </template> instead.
+
+
+────────────────────────
+PROPS TYPING RULES
+────────────────────────
+
+- Props must ALWAYS be defined using inline generic typing.
+- Never create a separate Props interface.
+- Never use runtime props declaration.
+- Never use defineProps({ ... }) object syntax.
+- Always use this exact pattern:
+
+defineProps<{
+  propName?: Type;
+}>();
+
+- Do not assign defineProps to a variable.
+- Do not use withDefaults unless explicitly required.
+- Props generic type must be written inline inside defineProps.
+
+
+────────────────────────
+EMITS STANDARD (STRICT)
+────────────────────────
+
+- All component events must follow the "onAction" naming convention.
+- Event names must start with "on" followed by PascalCase action.
+
+Correct examples:
+  onNext
+  onSubmit
+  onClose
+  onSave
+  onCancel
+  onUpdate
+
+Incorrect examples:
+  next
+  submit
+  close
+  save
+  update:modelValue
+  kebab-case events
+
+- Events must always be defined using typed inline generic syntax.
+- defineEmits must always be assigned to a const named "emit".
+- Never use string array syntax for emits.
+- Never use untyped emits.
+
+Required pattern:
+
+const emit = defineEmits<{
+  (e: 'onAction'): void;
+}>();
+
+- If payload exists, it must be strictly typed.
+- Never use any in emit payload.
+
+────────────────────────
+COMPOSABLES RULES
+────────────────────────
+
+Location:
+composables/<domain>/useSomething.ts
+
+Responsibilities:
+
+- Feature-level business logic.
+- Local feature state.
+- Orchestration between store and service.
+- Mapping API → domain types.
+
+Rules:
+
+- Must not mutate Pinia store state directly (only via store actions).
+- Must not contain rendering logic.
+- Async operations must use try/catch.
+- Errors must be returned or forwarded.
+- Keep return object minimal.
+- Do not expose internal implementation details.
+
+────────────────────────
+PINIA STORES
+────────────────────────
+
+Location:
+stores/<domain>/<domain>.store.ts
+
+Stores are responsible for:
+
+- Global state
+- Session state
+- Auth state
+- Feature flags
+- Cross-module domain state
+
+Rules:
+
+- No UI logic.
+- No template logic.
+- API calls must be performed inside actions.
+- State must be fully typed.
+- Actions must be async if calling services.
+- Avoid god-store pattern (split by domain).
+- Never access localStorage directly outside store layer.
+
+────────────────────────
+SERVICES LAYER
+────────────────────────
+
+Location:
+services/<domain>/<entity>.service.ts
+
+Responsibilities:
+
+- API communication only.
+- Use centralized api client.
+- Return strictly typed data.
+- Map raw response if necessary.
+
+Rules:
+
+- No global state mutation.
+- No UI logic.
+- No side effects outside request/response handling.
+- No direct usage inside components.
+- No business logic.
+
+────────────────────────
+UTILS
+────────────────────────
+
+- Pure functions only.
+- No state.
+- No side effects.
+- No DOM access.
+- Fully typed.
+- Generic utilities belong in /utils.
+- Domain utilities belong inside module folder.
+
+────────────────────────
+ROUTER
+────────────────────────
+
+- All routes typed.
+- Route meta must contain:
+    requiresAuth: boolean
+    permissions?: string[]
+
+- Auth/permission checks must be abstracted.
+- Navigation guards must remain thin.
+- No business logic in router config.
+
+────────────────────────
+ENVIRONMENT & CONFIG
+────────────────────────
+
+- Never use import.meta.env inside components.
+- Create:
+
+services/config/app.config.ts
+
+- Environment must be mapped to typed config object.
+- Components and composables must consume config, not env directly.
+
+────────────────────────
+TAILWIND & STYLING
+────────────────────────
+
+- Tailwind utility classes only.
+- No inline style attributes.
+- No global CSS overrides.
+- Layout patterns must be abstracted to reusable layout components.
+- UI primitives must live in components/ui.
+- No global styles.
+- BEM naming convention for classes.
+
+────────────────────────
+ERROR HANDLING
+────────────────────────
+
+- All async functions must use try/catch.
+- No silent catch blocks.
+- No console.log in production code.
+- Errors must be either:
+    handled,
+    propagated,
+    or forwarded to centralized handler.
+
+────────────────────────
+ANTI-PATTERNS (STRICTLY FORBIDDEN)
+────────────────────────
+
+- API calls inside components.
+- Business logic in template.
+- Store logic inside services.
+- Direct DOM manipulation.
+- Direct env usage outside config layer.
+- Mixing API and domain types.
+- Returning raw axios response to UI.
+- Using any type.
+- Massive multi-responsibility components.
+
+────────────────────────
+WHEN GENERATING NEW CODE
+────────────────────────
+
+- Strictly follow existing folder conventions.
+- Do not invent new patterns.
+- Respect layering.
+- Maintain strong type safety.
+- Prefer small focused modules.
+- Produce production-ready scalable code.
+
+
+────────────────────────
+BOOLEAN STATE NAMING RULE (STRICT)
+────────────────────────
+
+- All boolean variables must start with "is".
+- The pattern must always be:
+
+is + PascalCaseStateName
+
+Correct examples:
+  isLoading
+  isActive
+  isOpen
+  isVisible
+  isProgress
+  isDisabled
+  isAuthenticated
+  isSubmitting
+
+Incorrect examples:
+  loading
+  active
+  open
+  visible
+  progress
+  hasError
+  disabled
+  authenticated
+
+- Do not use prefixes like:
+  has
+  can
+  should
+  enable
+  disable
+
+- Boolean refs, store state, computed values, and props must all follow the "isXxx" pattern.
+- The "is" prefix is mandatory regardless of context (component, store, composable, or local state).
