@@ -9,14 +9,11 @@ defineProps<{
   <div
     class="ui-progress"
     role="progressbar"
-    :aria-valuenow="value"
     aria-valuemin="0"
     aria-valuemax="100"
+    :aria-valuenow="value"
   >
-    <div
-      class="ui-progress__bar"
-      :style="{ width: `${Math.min(100, Math.max(0, value))}%` }"
-    />
+    <div class="ui-progress__bar" :style="{ width: `${Math.min(100, Math.max(0, value))}%` }" />
   </div>
 </template>
 

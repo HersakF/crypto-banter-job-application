@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -11,7 +11,9 @@ export default defineConfig({
       "@test": fileURLToPath(new URL("./test", import.meta.url)),
     },
   },
-  server: {
-    port: 5174,
+  test: {
+    globals: true,
+    environment: "jsdom",
+    include: ["src/**/*.spec.ts", "src/**/*.spec.tsx", "src/**/*.spec.vue"],
   },
 });
